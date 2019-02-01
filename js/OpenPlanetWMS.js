@@ -1,35 +1,4 @@
 // js lib for OpenPlanetWMS , GPL v3.0
-
-function addPlanetaryNomenclatureSearchLayer (map, UAI_layers){
-	var mc = new L.Control.Search({
-		position:'topleft',
-		zoom: 4,
-		layer: UAI_layers,
-		initial: false,
-		collapsed: true,
-		propertyName: 'name',
-		filterData: function(text, records) {
-			var I, icase, regSearch, frecords = {};
-			text = text.replace(/[.*+?^${}()|[\]\\]/g, '');  //sanitize remove all special characters
-			if(text==='')
-				return [];
-			I = this.options.initial ? '^' : '';  //search only initial text
-			icase = !this.options.casesensitive ? 'i' : undefined;
-			
-			regSearch = new RegExp(I + text, icase);
-			for(var key in records) {
-				if( regSearch.test(key) || regSearch.test(records[key].layer.feature.properties.name_EBCDIC))
-					frecords[key]= records[key];
-			}
-			return frecords;
-		},		
-		textCancel: '🔍✘',
-		textErr: '∄',
-		textPlaceholder: '🔍...'
-	});
-	map.addControl(mc);
-}
-
 function NASA_mars_layer_group (NASA_WMS, URI_base, lingua){
 	function Mars_layer(id, WMS_dir, ext, z, attribution){
 		var tl = new L.TileLayer(WMS_dir + '/{z}/{y}/{x}' + ext ,{
