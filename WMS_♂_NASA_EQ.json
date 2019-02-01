@@ -1,0 +1,173 @@
+{
+    "mcm": {
+        "adr": "EQ/Mars_Combined_Map",
+        "text": {
+            "ru": "Совмещённая",
+            "en": "Combined"
+        },
+        "ext": ".jpg",
+        "z": 8
+    },
+    "v": {
+        "adr": "EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m",
+        "text": {
+            "ru": "Снимки аппарата Викинг",
+            "en": "Map by Viking mission"
+        },
+        "ext": ".jpg",
+        "z": 7
+    },
+    "m1": {
+        "adr": "EQ/Mars_MGS_MOLA_ClrShade_merge_global_463m",
+        "text": {
+            "ru": "Орбитальный лазерный высотомер 463м",
+            "en": "MOLA 463m"
+        },
+        "ext": ".jpg",
+        "z": 8
+    },
+    "m2": {
+        "adr": "EQ/Mars_MGS_MOLA_DEM_mosaic_global_463m_8",
+        "text": {
+            "ru": "Орбитальный лазерный высотомер 463 м(2)",
+            "en": "MOLA 463m 2"
+        },
+        "ext": ".png",
+        "z": 5
+    },
+    "m3": {
+        "adr": "EQ/Mars_MOLA_blend200ppx_HRSC_ClrShade_clon0dd_200mpp_lzw",
+        "text": {
+            "ru": "Стереокамера высокого разрешения (цвет)",
+            "en": "HRSC_ClrShade"
+        },
+        "ext": ".jpg",
+        "z": 8
+    },
+    "m4": {
+        "adr": "EQ/Mars_MOLA_blend200ppx_HRSC_Shade_clon0dd_200mpp_lzw",
+        "text": {
+            "ru": "Стереокамера высокого разрешения",
+            "en": "HRSC_Shade"
+        },
+        "ext": ".png",
+        "z": 7
+    },
+    "m5": {
+        "adr": "EQ/mola_roughness",
+        "text": {
+            "ru": "шероховатости",
+            "en": "roughness"
+        },
+        "ext": ".png",
+        "z": 1
+    },
+    "tes0": {
+        "adr": "EQ/Mars_MGS_TES_Albedo_mosaic_global_7410m",
+        "text": {
+            "ru": "ТЭС, 7410м",
+            "en": "MGS_TES_Albedo_7410m"
+        },
+        "ext": ".png",
+        "z": 1
+    },
+    "tes1": {
+        "adr": "EQ/TES_Dust",
+        "text": {
+            "ru": "ТЭС, пыль",
+            "en": "TES_Dust"
+        },
+        "ext": ".png",
+        "z": 2
+    },
+    "tes2": {
+        "adr": "EQ/tes_ruffdust",
+        "text": {
+            "ru": "ТЭС турухтанная пыль",
+            "en": "tes_ruffdust"
+        },
+        "ext": ".png",
+        "z": 3
+    },
+    "tes3": {
+        "adr": "EQ/TES_Glass_Clay",
+        "text": {
+            "ru": "ТЭС стеклоглины",
+            "en": "TES_Glass_Clay"
+        },
+        "ext": ".png",
+        "z": 1
+    },
+    "tes4": {
+        "adr": "EQ/TES_Plagioclase",
+        "text": {
+            "ru": "ТЭС плагиоклазы",
+            "en": "TES_Plagioclase"
+        },
+        "ext": ".png",
+        "z": 2
+    },
+    "tes5": {
+        "adr": "EQ/TES_Thermal_Inertia",
+        "text": {
+            "ru": "ТЭС теплоёмкость",
+            "en": "TES_Thermal_Inertia"
+        },
+        "ext": ".png",
+        "z": 1
+    },
+    "thm1": {
+        "adr": "EQ/Mars_MO_THEMIS-IR-Day_mosaic_global_100m_v12_clon0_ly",
+        "text": {
+            "ru": "дневной инфракрасный",
+            "en": "IR-Day"
+        },
+        "ext": ".png",
+        "z": 8
+    },
+    "thm2": {
+        "adr": "EQ/Mars_MO_THEMIS-IR-Night_mosaic_60N60S_100m_v14_clon0_ly",
+        "text": {
+            "ru": "ночной инфракрасный",
+            "en": "IR-Night"
+        },
+        "ext": ".png",
+        "z": 8
+    },
+    "thm3": {
+        "adr": "EQ/THEMIS_DayIR_Controlled_Mosaics_65NS_dd0_sept2017",
+        "text": {
+            "ru": "дневной инфракрасный сентябрь 2017",
+            "en": "DayIR_Controlled sept2017"
+        },
+        "ext": ".png",
+        "z": 9
+    },
+    "thm4": {
+        "adr": "EQ/THEMIS_NightIR_Controlled_Mosaics_65NS_dd0_sept2017",
+        "text": {
+            "ru": "ночной инфракрасный сентябрь 2017",
+            "en": "NightIR_Controlled sept2017"
+        },
+        "ext": ".png",
+        "z": 9
+    },
+    "pm": {
+        "adr": "EQ/prettyMarsFixed",
+        "text": {
+            "ru": "Обзорная карта",
+            "en": "prettyMarsFixed"
+        },
+        "ext": ".jpg",
+        "z": 6
+    },
+    "hrs1": {
+        "adr": "EQ/HiRISE_Opportunity",
+        "text": {
+            "ru": "HiRISE Opportunity",
+            "en": "HiRISE Opportunity"
+        },
+        "ext": ".png",
+        "z": 17
+    }
+}

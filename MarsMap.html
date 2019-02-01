@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Карты планеты Марс (♂) EQ проекция</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="images/Mars-icon.png" />
+	<link rel="stylesheet" href="lib/leaflet.css"/>
+	<link rel="stylesheet" href="lib/leaflet-search.css"/>
+	<link rel="stylesheet" href="lib/leaflet-panel-layers.css"/>	
+	<script src="lib/leaflet.js"></script>
+	<script src="lib/leaflet-search.js"></script>	
+	<script src="lib/leaflet-panel-layers.js"></script>
+	<script src="js/OpenPlanetWMS.js"></script>
+	<script src="lib/L.Graticule.js"></script>	
+</head>
+<style>
+.coord{ width=100px; height=25px; float:left; margin: 0; padding: 0;}
+</style>
+<body>	
+	<div id="mapid" style="width: 98vw; height: 800px;"></div>
+	<div style="width=400px; height=25px; margin: 0; margin-left: 0px; padding: 0;">
+		<p class="coord" id="lat"></p>
+		<p class="coord">&nbsp</p>
+		<p class="coord" id="lon"> </p>
+	</div>
+	<div style="width=400px; height=25px; margin: 0; margin-left: 250px; padding: 0;">
+		<p class="coord" id="lat_60"></p>
+		<p class="coord">&nbsp</p>
+		<p class="coord" id="lon_60"> </p>
+	</div>
+	</br>
+	<div id="legend" style="width: 98vw; height: 100px; display:none; margin: 0; margin-left: 0px; padding: 0;">
+		<img style="height: 50px;" src="images/800px-MOLA_maps_color_elevation_key.png">
+	</div>
+<script>
+	var Config = {
+		URI: {
+			data : "https://raw.githubusercontent.com/mkgrgis/OpenPlanetaryData/master/",
+			WMS_NASA_base : 'https://trek.nasa.gov/tiles/Mars',
+			WMS_NASA_local : '/opt/Κόσμος/sr00/NASA/',
+			Mars_nomenclature_shp : 'http://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature.zip'
+		}
+	}
+
+	var NASA_WMS;
+	var gMars;
+	var gr_gr;
+
+function WMS_json_ok(req){
+	NASA_WMS = JSON.parse(req.currentTarget.responseText);
+	IO_ok.NASA_WMS = true;
+	console.log('NASA WMS ok');	
+	All_ok();
+}
+
+function All_ok(){
+	if (!IO_json.status.NASA_WMS || !UAI_mars.status /*|| !IO_ok.gMars*/)
+		return;
+	var G_pref = 'https://www.google.com/mars/';
+	var gr_gr = default_graticule();
+	var overLayers = [
+		UAI_mars.UAI_layers,
+		// gMars_group(GMars, G_pref),
+		{
+			group: "#",
+			collapsed: true,
+			layers: gr_gr
+		}
+	];	
+	var baseLayers = [
+		{
+			group: 'NASA WMS',
+			collapsed: false,
+			layers: NASA_mars_layer_group (NASA_WMS, Config.URI.WMS_NASA_base, lingua)
+		}
+	];	
+
+	var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
+		compact: true,		
+		collapsibleGroups: true,
+		title: "WMS & data",
+		});
+	planetMap.addControl(panelLayers);
+	planetMap.addLayer(baseLayers[0].layers[0].layer);
+	/*planetMap.on('zoomend', function() {
+		if (planetMap.getZoom()<7)
+			planetMap.removeLayer(gr_gr[0].layer);
+		if (planetMap.getZoom()<2)
+			planetMap.removeLayer(gr_gr[1].layer);
+		if (planetMap.getZoom()>=7)
+			planetMap.addLayer(gr_gr[0].layer);
+		if (planetMap.getZoom()>=2)
+			planetMap.addLayer(gr_gr[1].layer);
+		});*/
+	function legend_f(a) {
+		var elevdiv = document.getElementById('legend');
+		var elev_ = (a.name.indexOf('Высоты') != -1);
+		elevdiv.style.display = (elev_) ? 'block' : 'none';
+	}
+
+	planetMap.on('baselayerchange', legend_f);
+	planetMap.on('baselayeradd', legend_f);
+	planetMap.on('mousemove', onCoord);	
+	console.log('∀ ✔');
+};
+</script>
+<script src='lib/wicket.js'></script>
+<script src='lib/shp.js'></script>
+<script src="js/UAI_module.js"></script>
+<script>
+var lingua = navigator.language.split('-')[0];	
+var planetMap = L.map('mapid', {crs:L.CRS.EPSG4326}).setView([0, 0], 3);
+planetMap.doubleClickZoom.disable();
+var UAI_mars = new UAI_module(
+	planetMap,
+	{
+		nomenclature_json : Config.URI.data + '/universal/nomenclature.json',
+		planet_shp : Config.URI.data + '/♂/MARS_nomenclature.zip',
+		planet_wkt_json : Config.URI.data + '/♂/MARS_nomenclature.json',
+		baloon_directory : 'mark'
+	},
+	function (){
+		planetMap.addControl(UAI_mars.search_layer());
+		All_ok();
+	},
+	true,
+	lingua
+);
+
+IO_json(
+	'NASA_WMS', 
+	'WMS_♂_NASA_EQ.json',
+	function(o) {
+		NASA_WMS = JSON.parse(o.req.currentTarget.responseText);
+		All_ok();
+		},
+	this
+	);
+/*
+IO_json(
+	'gMaRS', 
+	'https://raw.githubusercontent.com/mkgrgis/gMarsWMS/master/data/gMars.json',
+	function(o) {
+		gMars = JSON.parse(o.req.currentTarget.responseText);
+		All_ok();
+		},
+	this
+	); // */
+</script>
+</body>
+</html>
