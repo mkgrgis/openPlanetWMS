@@ -56,7 +56,7 @@ function WMS_json_ok(req){
 }
 
 function All_ok(){
-	if (!IO_json.status.NASA_WMS || !UAI_mars.status /*|| !IO_ok.gMars*/)
+	if (!IO_json.status.NASA_WMS || !UAI_mars.status)
 		return;
 	var G_pref = 'https://www.google.com/mars/';
 	var gr_gr = default_graticule();
@@ -140,7 +140,7 @@ IO_json(
 	);
 /*
 IO_json(
-	'gMaRS', 
+	'gMars', 
 	'https://raw.githubusercontent.com/mkgrgis/gMarsWMS/master/data/gMars.json',
 	function(o) {
 		gMars = JSON.parse(o.req.currentTarget.responseText);
