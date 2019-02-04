@@ -318,11 +318,11 @@ UAI_module.prototype.info = function (fp, layer) {
 	} else
 		var descr = '';
 	var infoHTML = '<b>' + fp.name + '</b> (' + fp.code + ')' + ((fp.diameter != 0)? (' ⌀≈' + fp.diameter + ' km ') : ' ') +
+	'[' + this.nomencl_descr(fp.code, '') + ' = ' + descr + ' ]' +
 	'</br><a href= "' + fp.link + '"> № ' + fp.UAI_id + ' (' + fp.approvaldt.toISOString().substring(0,10) + ')</a>' + '</br>' + 
 	' ensc. en :' + fp.origin + '</br>' +
 	'(' + fp.ethnicity + ', '+ fp.continent + ')</br>' +   
-	'⎕ ' + (fp.quad ? (fp.quad.code ? fp.quad.code : '∅') + ( fp.quad.name? ' (' + fp.quad.name + ')' : '') : '∅') + '</br>' +
-	'[' + this.nomencl_descr(fp.code, '') + ' = ' + descr + ' ]';
+	'⎕ ' + (fp.quad ? (fp.quad.code ? fp.quad.code : '∅') + ( fp.quad.name? ' (' + fp.quad.name + ')' : '') : '∅') + '</br>';
 	delete descr;
 	delete nom_el;
 	return infoHTML;
