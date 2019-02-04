@@ -1,7 +1,7 @@
 # Simple HTML/JavaScript application for maps of Mars
 Use public NASA WMS, Leaflet, search plugin, layer plugin, UAI data etc.
 # gMarsWMS
-Simple HTML/javascript Leaflet.js map of Mars from Google with official Union Astronomique International object nomenclature for Mars.
+Simple HTML/javascript Leaflet.js map of Mars from Google with official Union Astronomique International object nomenclature for Mars. Based on https://github.com/mkgrgis/OpenPlanetaryData
 
 
 <img src="https://mkgrgis.github.io/mkgrgis/openPlanetWMS/openPlanetWMS_demo.png"/>
@@ -40,10 +40,10 @@ Full list of dependences see in html/js debugger network section.
 
 # Some impotant files
 
-  https://github.com/mkgrgis/OpenPlanetWMS/blob/master/data/mars/MARS_nomenclature.json - contures of objects
+  https://github.com/mkgrgis/OpenPlanetaryData/blob/master/%E2%99%82/MARS_nomenclature.json.json - contures of objects
   
-  https://github.com/mkgrgis/OpenPlanetWMS/blob/master/data/mars/MARS_nomenclature.zip - official (but not always actual) nomenclature, copyed from http://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature.zip
+  https://github.com/mkgrgis/OpenPlanetaryData/blob/master/%E2%99%82/MARS_nomenclature.zip - official (but not always actual) nomenclature, copyed from http://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature.zip
   
-  https://github.com/mkgrgis/OpenPlanetWMS/blob/master/data/nomenclature.json - simple classificator of planetary nomenclature objects
+  https://github.com/mkgrgis/OpenPlanetaryData/blob/master/universal/nomenclature.json - simple classificator of planetary nomenclature objects
   
   https://github.com/mkgrgis/OpenPlanetWMS/blob/master/mark - various ballons for objects
