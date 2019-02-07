@@ -176,7 +176,8 @@ UAI_module.prototype.search_layer = function () {
 			
 			regSearch = new RegExp(I + text, icase);
 			for(var key in records) {
-				if( regSearch.test(key) || regSearch.test(records[key].layer.feature.properties.name_EBCDIC))
+				var p = records[key].layer.feature.properties;
+				if( regSearch.test(key) || regSearch.test(p.name_EBCDIC) || regSearch.test(p.UAI_id))
 					frecords[key]= records[key];
 			}
 			return frecords;
@@ -318,11 +319,11 @@ UAI_module.prototype.info = function (fp, layer) {
 	} else
 		var descr = '';
 	var infoHTML = '<b>' + fp.name + '</b> (' + fp.code + ')' + ((fp.diameter != 0)? (' ⌀≈' + fp.diameter + ' km ') : ' ') +
-	'[' + this.nomencl_descr(fp.code, '') + ' = ' + descr + ' ]' +
 	'</br><a href= "' + fp.link + '"> № ' + fp.UAI_id + ' (' + fp.approvaldt.toISOString().substring(0,10) + ')</a>' + '</br>' + 
 	' ensc. en :' + fp.origin + '</br>' +
 	'(' + fp.ethnicity + ', '+ fp.continent + ')</br>' +   
-	'⎕ ' + (fp.quad ? (fp.quad.code ? fp.quad.code : '∅') + ( fp.quad.name? ' (' + fp.quad.name + ')' : '') : '∅') + '</br>';
+	'⎕ ' + (fp.quad ? (fp.quad.code ? fp.quad.code : '∅') + ( fp.quad.name? ' (' + fp.quad.name + ')' : '') : '∅') + '</br>' +
+	'[' + this.nomencl_descr(fp.code, '') + ' = ' + descr + ' ]';
 	delete descr;
 	delete nom_el;
 	return infoHTML;
