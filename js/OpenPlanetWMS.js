@@ -1,4 +1,43 @@
 // js lib for OpenPlanetWMS , GPL v3.0
+
+function USGS_layers (XML, context)
+{
+	var T_ = XML.getElementsByTagName('Service')[0].getElementsByTagName('Title')[0];
+	var Title = T_.textContent
+	var Layer_ = XML.getElementsByTagName('Capability')[0].getElementsByTagName('Layer')[0];
+	var Layers = Layer_.getElementsByTagName('Layer');
+	var WMS_group = [];
+
+	for (var il in Layers) {
+		var l = Layers[il];
+		if (typeof l != 'object')
+			continue;
+		var bb = l.getElementsByTagName('BoundingBox')[0];
+		var CRS = bb ? bb.getAttribute('CRS') : null;
+		WMS_group.push({
+			name: l.getElementsByTagName('Title')[0].textContent,
+			layer: L.tileLayer.wms(
+				context.base,
+				{
+					format: 'image/jpeg',
+					version: '1.1.1',
+					request: 'GetMap',
+					map: context.map,
+					layers: l.getElementsByTagName('Name')[0].textContent,
+					srs: CRS ? CRS : 'EPSG:4326',
+					width: 256,
+					height: 256
+				}
+			)
+		}); // push
+	};
+	return {
+		group: Title + '\n' + context.base,
+		collapsed: false,
+		layers: WMS_group
+	};
+}
+
 function NASA_mars_layer_group (NASA_WMS, URI_base, lingua){
 	function Mars_layer(id, WMS_dir, ext, z, attribution){
 		var tl = new L.TileLayer(WMS_dir + '/{z}/{y}/{x}' + ext ,{

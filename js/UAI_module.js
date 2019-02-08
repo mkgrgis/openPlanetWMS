@@ -5,10 +5,15 @@
  * @param {*} retf function after ok
  * @param {*} context context object for using in function after ok
  */
-function IO_json (code, URI, retf, context){
+
+function IO_xml (code, URI, retf, context){ 
+	IO_json (code, URI, retf, context, 'application/xml');
+}
+
+function IO_json (code, URI, retf, context, type = 'application/json'){
 	IO_json.status[code] = false;
 	var req = new XMLHttpRequest();
-	req.overrideMimeType("application/json");
+	req.overrideMimeType(type);
 	req._context = context;
 	req._retf = retf;
 	req._code = code;
