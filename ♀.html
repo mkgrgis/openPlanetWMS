@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>WMS (♀) EPSG:4326</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="images/Mars-icon.png" />
+	<link rel="stylesheet" href="lib/leaflet.css"/>
+	<link rel="stylesheet" href="lib/leaflet-search.css"/>
+	<link rel="stylesheet" href="lib/leaflet-panel-layers.css"/>	
+	<script src="lib/leaflet.js"></script>
+	<script src="lib/leaflet-search.js"></script>	
+	<script src="lib/leaflet-panel-layers.js"></script>
+	<script src="js/OpenPlanetWMS.js"></script>
+	<script src="lib/L.Graticule.js"></script>	
+</head>
+<style>
+.coord{ width:100px; height:25px; float:left; margin: 0; padding: 0;}
+</style>
+<body>	
+	<h2>Demo (♀) <a href = 'https://github.com/mkgrgis/openPlanetWMS'>openPlanetWMS</a></h2>	
+	<div id="mapid" style="width: 98vw; height: 800px;"></div>
+	<div style="width=400px; height=25px; margin: 0; margin-left: 0px; padding: 0;">
+		<p class="coord" id="lat"></p>
+		<p class="coord">&nbsp</p>
+		<p class="coord" id="lon"> </p>
+	</div>
+	<div style="width=400px; height=25px; margin: 0; margin-left: 250px; padding: 0;">
+		<p class="coord" id="lat_60"></p>
+		<p class="coord">&nbsp</p>
+		<p class="coord" id="lon_60"> </p>
+	</div>
+	</br>
+<script>
+	var Config = {
+		URI: {
+			data : "https://raw.githubusercontent.com/mkgrgis/OpenPlanetaryData/master/",
+			Mars_nomenclature_shp : 'http://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature.zip'
+		}
+	}
+
+	var gr_gr;
+
+
+
+function All_ok(){
+	if (!UAI_venus.status)
+		return;	
+/*
+http://212.201.46.76:8080/geoserver/planet/wms?
+SERVICE=WMS&
+VERSION=1.3.0&
+REQUEST=GetMap&
+FORMAT=image/png&
+TRANSPARENT=true&
+LAYERS=planet:base_venus&
+tiled=true&
+WIDTH=256&
+HEIGHT=256&
+CRS=EPSG:3857&
+STYLES=&
+BBOX=10018754.17139462,5009377.085697312,15028131.257091932,10018754.171394624 */
+	var venus0 = L.tileLayer.wms(
+		'http://212.201.46.76:8080/geoserver/planet/wms',
+		{	
+			layers: 'planet:base_venus',
+			tiled: true,
+			format: 'image/png',
+			transparent: true,
+			width : 256,
+			height : 256,
+			'CRS' : 'EPSG:3857',
+			version : '1.3.0',
+			request : 'GetMap'
+			} //, serverType: 'geoserver'
+		).addTo(planetMap);
+	var gr_gr = default_graticule();
+	var overLayers = [
+		UAI_venus.UAI_layers,		
+		{
+			group: "#",
+			collapsed: false,
+			layers: gr_gr
+		}
+	];	
+
+	
+	var panelLayers = new L.Control.PanelLayers({}, overLayers, {
+		compact: true,		
+		collapsibleGroups: true,		
+		});
+	planetMap.addControl(panelLayers);
+	//planetMap.addLayer(venus0);
+
+	/*planetMap.on('baselayerchange', legend_f);
+	planetMap.on('baselayeradd', legend_f);*/
+	planetMap.on('mousemove', onCoord);	
+	console.log('∀ ✔');
+};
+</script>
+<script src='lib/wicket.js'></script>
+<script src='lib/shp.js'></script>
+<script src="js/UAI_module.js"></script>
+<script>
+var lingua = navigator.language.split('-')[0];	
+var planetMap = L.map('mapid', {crs:L.CRS.EPSG4326}).setView([0, 0], 3);
+planetMap.doubleClickZoom.disable();
+var UAI_venus = new UAI_module(
+	planetMap,
+	{
+		nomenclature_json : Config.URI.data + '/universal/nomenclature.json',
+		planet_shp : Config.URI.data + '/♀/VENUS_nomenclature.zip',		
+		baloon_directory : 'mark'
+	},
+	function (){
+		planetMap.addControl(UAI_venus.search_layer());
+		All_ok();
+	},
+	true,
+	lingua
+);
+</script>
+</body>
+</html>
