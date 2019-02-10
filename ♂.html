@@ -61,10 +61,13 @@
 		var gMars;
 		var gr_gr;
 		var USGS_WMS;
+		var baseLayers = [null, null];
 
 		function USGS_Mars_XML_ok(o) {
 			var XML = o.req.currentTarget.responseXML;
 			USGS_WMS = USGS_layers(XML, o.context);
+			baseLayers[1] = USGS_WMS;
+			baseLayers[1].collapsed = true;
 			All_ok();
 		}
 
@@ -89,17 +92,15 @@
 					layers: gr_gr
 				}
 			];
-			var baseLayers = [
-				{
-					group: 'NASA WMS',
-					collapsed: false,
-					layers: NASA_mars_layer_group(NASA_WMS, Config.URI.WMS_NASA_base, lingua)
-				},
-				USGS_WMS
-			];
+			baseLayers[0] = {
+				group: 'NASA WMS',
+				layers: NASA_mars_layer_group(NASA_WMS, Config.URI.WMS_NASA_base, lingua)
+			};
 
 			var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
 				compact: true,
+				compactOffset: 0,
+				collapsed: true,
 				collapsibleGroups: true,
 				title: "WMS & data",
 			});
@@ -128,7 +129,7 @@
 		};
 
 
-		var lingua = navigator.language.split('-')[0];
+		var lingua = 'ru';//navigator.language.split('-')[0];
 		var planetMap = L.map('mapid', { crs: L.CRS.EPSG4326 }).setView([0, 0], 3);
 		planetMap.doubleClickZoom.disable();
 		var UAI_mars = new UAI_module(
