@@ -1,4 +1,4 @@
-# Simple HTML/JavaScript application for maps of Mars
+# Simple HTML/JavaScript application for maps of Mars, Venus, Mercury, Titan etc.
 Use public NASA WMS, Leaflet, search plugin, layer plugin, UAI data etc.
 # gMarsWMS
 Simple HTML/javascript Leaflet.js map of Mars from Google with official Union Astronomique International object nomenclature for Mars. Based on https://github.com/mkgrgis/OpenPlanetaryData
