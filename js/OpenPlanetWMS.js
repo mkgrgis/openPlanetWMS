@@ -32,7 +32,7 @@ function USGS_layers (XML, context)
 		}); // push
 	};
 	return {
-		group: Title + '\n' + context.base,
+		group: Title + '<b> (' + context.base.split('/')[2]+ ')</b>',
 		collapsed: false,
 		layers: WMS_group
 	};

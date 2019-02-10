@@ -24,6 +24,19 @@
 		display:inline;
 		font-size: 10pt;		
 	}
+	.icon {
+		display: inline-block;
+		margin: 0px;
+		height: 16px;
+		width: 16px;
+		background-color: #ccc;
+	}
+	.icon-usgs {
+		background: url('images/usgs.png') center center no-repeat;
+	}
+	.icon-nasa {
+		background: url('images/nasa.png') center center no-repeat;
+	}
 </style>
 <body>
 	<h2>Demo <a href='https://github.com/mkgrgis/openPlanetWMS'>openPlanetWMS</a></h2>
@@ -68,6 +81,9 @@
 			USGS_WMS = USGS_layers(XML, o.context);
 			baseLayers[1] = USGS_WMS;
 			baseLayers[1].collapsed = true;
+			for (var l in baseLayers[1].layers){
+				baseLayers[1].layers[l].icon = '<i class="icon icon-usgs"></i>';
+			}
 			All_ok();
 		}
 
@@ -92,17 +108,21 @@
 					layers: gr_gr
 				}
 			];
+
 			baseLayers[0] = {
 				group: 'NASA WMS',
 				layers: NASA_mars_layer_group(NASA_WMS, Config.URI.WMS_NASA_base, lingua)
 			};
+			for (var l in baseLayers[0].layers){
+				baseLayers[0].layers[l].icon = '<i class="icon icon-nasa"></i>';
+			}
 
 			var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
 				compact: true,
 				compactOffset: 0,
 				collapsed: true,
 				collapsibleGroups: true,
-				title: "WMS & data",
+				title: "WMS & data"
 			});
 			planetMap.addControl(panelLayers);
 			planetMap.addLayer(baseLayers[0].layers[0].layer);
