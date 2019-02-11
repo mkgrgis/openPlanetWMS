@@ -92,12 +92,33 @@
 		function All_ok() {
 			if (!UAI_titan.status || !usgs_ok)
 				return;
-			
+
+			/*
+			https://webgis3.wr.usgs.gov/arcgis/rest/services/Titan_SAR_Basemap/MapServer/export?
+dpi=96&
+transparent=true&
+format=png24&
+layers=show:0,1&
+size=256,256&
+f=image
+*/
+			var l0 = L.tileLayer.wms(
+			'https://webgis3.wr.usgs.gov/arcgis/rest/services/Titan_SAR_Basemap/MapServer/export',
+				{
+					//layers: 'show:0,1',
+					//tiled: true,
+					format: 'png24',
+					transparent: true,
+					size: '256,256',					
+					f: 'image'
+				}
+			);
 			baseLayers[0] = USGS_WMS;
-			/*baseLayers[1] = {
-				name: '♄ - Titan <b>(212.201.46.76)</b>',
+			baseLayers[1] = {
+				name: '♄ - Titan <b>(webgis3.wr.usgs.gov)</b>',
 				layer: l0
-			};*/
+			};
+			
 			var gr_gr = default_graticule();
 			var overLayers = [
 				UAI_titan.UAI_layers,
