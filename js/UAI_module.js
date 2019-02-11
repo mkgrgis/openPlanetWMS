@@ -67,7 +67,7 @@ function UAI_module(leaflet_map, paths, retf, norm180, lingua){
 	var planet = pp[pp.length - 1].split('_')[0];
 	delete pp;
 	UAI_module.req[planet] = this;
-	shp(paths.planet_shp).then(UAI_module.shp_ok);
+	shp(paths.planet_shp).then(UAI_module.shp_ok, UAI_module.shp_non);
 
 	if (typeof paths.planet_wkt_json != 'undefined'){
 		IO_json(
@@ -89,6 +89,12 @@ UAI_module.shp_ok = function(data) {
 	var p =data.fileName.split('_')[0];
 	var el = UAI_module.req[p];
 	el.shp_ok(data);
+}
+
+UAI_module.shp_non = function(data) {
+	console.log('shp ✘ :' + data.message);
+	var x = this;
+	alert ('UAI shp ✘ :' + data.message);
 }
  
 UAI_module.prototype.shp_ok = function(data) {
