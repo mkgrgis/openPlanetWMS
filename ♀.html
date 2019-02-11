@@ -1,31 +1,44 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>WMS (♀) EPSG:4326</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="shortcut icon" href="images/Mars-icon.png" />
-	<link rel="stylesheet" href="lib/leaflet.css"/>
-	<link rel="stylesheet" href="lib/leaflet-search.css"/>
-	<link rel="stylesheet" href="lib/leaflet-panel-layers.css"/>	
+	<link rel="shortcut icon" href="images/♀.png" />
+	<link rel="stylesheet" href="lib/leaflet.css" />
+	<link rel="stylesheet" href="lib/leaflet-search.css" />
+	<link rel="stylesheet" href="lib/leaflet-panel-layers.css" />
 	<script src="lib/leaflet.js"></script>
-	<script src="lib/leaflet-search.js"></script>	
+	<script src="lib/leaflet-search.js"></script>
 	<script src="lib/leaflet-panel-layers.js"></script>
 	<script src="js/OpenPlanetWMS.js"></script>
-	<script src="lib/L.Graticule.js"></script>	
+	<script src="lib/L.Graticule.js"></script>
 </head>
 <style>
 	.coord {
-		width: 100px;
-		height: 25px;		
 		margin: 0px;
 		padding: 0px;
 		display:inline;
 		font-size: 10pt;		
 	}
+	.icon {
+		display: inline-block;
+		margin: 0px;
+		height: 16px;
+		width: 16px;
+		background-color: #ccc;
+	}
+	.icon-usgs {
+		background: url('images/usgs.png') center center no-repeat;
+	}
+	.icon-nasa {
+		background: url('images/nasa.png') center center no-repeat;
+	}
 </style>
-<body>	
-	<h2>Demo (♀) <a href = 'https://github.com/mkgrgis/openPlanetWMS'>openPlanetWMS</a></h2>	
+
+<body>
+	<h2>Demo (♀) <a href='https://github.com/mkgrgis/openPlanetWMS'>openPlanetWMS</a></h2>
 	<div id="mapid" style="width: 98vw; height: 800px;"></div>
 	<div name="coord" style="display:inline-block;">
 		<div style="display:inline-block; width:175px; ">
@@ -37,93 +50,131 @@
 			<p class="coord" id="lat_60"></p>
 			<p class="coord">&nbsp</p>
 			<p class="coord" id="lon_60"> </p>
-		</div>				
+		</div>
 	</div>
-<script>
-	var Config = {
-		URI: {
-			data : "https://raw.githubusercontent.com/mkgrgis/OpenPlanetaryData/master/"
+	<script>
+		var Config = {
+			URI: {
+				data: "https://raw.githubusercontent.com/mkgrgis/OpenPlanetaryData/master/",
+				usgs_base: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv',
+				usgs_group: '/maps/venus/venus_simp_cyl.map'
+			}
 		}
-	}
 
-	var gr_gr;
+		var gr_gr;
+		var USGS_WMS;
+		var usgs_ok;
+		var baseLayers = [];
 
-function All_ok(){
-	if (!UAI_venus.status)
-		return;	
-/*
-http://212.201.46.76:8080/geoserver/planet/wms?
-SERVICE=WMS&
-VERSION=1.3.0&
-REQUEST=GetMap&
-FORMAT=image/png&
-TRANSPARENT=true&
-LAYERS=planet:base_venus&
-tiled=true&
-WIDTH=256&
-HEIGHT=256&
-CRS=EPSG:3857&
-STYLES=&
-BBOX=10018754.17139462,5009377.085697312,15028131.257091932,10018754.171394624 */
-	var venus0 = L.tileLayer.wms(
-		'http://212.201.46.76:8080/geoserver/planet/wms',
-		{	
-			layers: 'planet:base_venus',
-			tiled: true,
-			format: 'image/png',
-			transparent: true,
-			width : 256,
-			height : 256,
-			'CRS' : 'EPSG:3857',
-			version : '1.3.0',
-			request : 'GetMap'
-			} //, serverType: 'geoserver'
-		).addTo(planetMap);
-	var gr_gr = default_graticule();
-	var overLayers = [
-		UAI_venus.UAI_layers,		
-		{
-			group: "#",
-			collapsed: false,
-			layers: gr_gr
-		}
-	];	
+		function USGS_XML_ok(o) {
+			if (o.req.currentTarget.status != 200){				
+				usgs_ok = true;
+				All_ok();
+				return null;
+			} else {
+				var XML = o.req.currentTarget.responseXML;
+				USGS_WMS = USGS_layers(XML, o.context);
+				USGS_WMS.collapsed = true;
+				for (var l in USGS_WMS.layers){
+					USGS_WMS.layers[l].icon = '<i class="icon icon-usgs"></i>';
+				}
+				baseLayers[1] = USGS_WMS;
+				//console.log('USGS WMS ✔');
+				usgs_ok = true;
+				All_ok();
+			}
+		}		
 
-	
-	var panelLayers = new L.Control.PanelLayers(null, overLayers, {
-		compact: true,		
-		collapsibleGroups: true,		
-		});
-	planetMap.addControl(panelLayers);
-	//planetMap.addLayer(venus0);
+		function All_ok() {
+			if (!UAI_venus.status || !usgs_ok)
+				return;
+			/*
+			http://212.201.46.76:8080/geoserver/planet/wms?
+			SERVICE=WMS&
+			VERSION=1.3.0&
+			REQUEST=GetMap&
+			FORMAT=image/png&
+			TRANSPARENT=true&
+			LAYERS=planet:base_venus&
+			tiled=true&
+			WIDTH=256&
+			HEIGHT=256&
+			CRS=EPSG:3857&
+			STYLES=&
+			BBOX=10018754.17139462,5009377.085697312,15028131.257091932,10018754.171394624 */
+			var l0 = L.tileLayer.wms(
+				'http://212.201.46.76:8080/geoserver/planet/wms',
+				{
+					layers: 'planet:base_venus',
+					tiled: true,
+					format: 'image/png',
+					transparent: true,
+					width: 256,
+					height: 256,
+					'CRS': 'EPSG:3857',
+					version: '1.3.0',
+					request: 'GetMap'
+				} //, serverType: 'geoserver'
+			);
+			baseLayers[0] = USGS_WMS;
+			baseLayers[1] = {
+				name: '♀ <b>(212.201.46.76)</b>',
+				layer: l0
+			};
+			var gr_gr = default_graticule();
+			var overLayers = [
+				UAI_venus.UAI_layers,
+				{
+					group: "#",
+					collapsed: false,
+					layers: gr_gr
+				}
+			];
 
-	/*planetMap.on('baselayerchange', legend_f);
-	planetMap.on('baselayeradd', legend_f);*/
-	planetMap.on('mousemove', onCoord);	
-	console.log('∀ ✔');
-};
-</script>
-<script src='lib/wicket.js'></script>
-<script src='lib/shp.js'></script>
-<script src="js/UAI_module.js"></script>
-<script>
-var lingua = navigator.language.split('-')[0];	
-var planetMap = L.map('mapid', {crs:L.CRS.EPSG4326}).setView([0, 0], 3);
-planetMap.doubleClickZoom.disable();
-var UAI_venus = new UAI_module(
-	planetMap,
-	{
-		nomenclature_json : Config.URI.data + '/universal/nomenclature.json',
-		planet_shp : Config.URI.data + '/♀/VENUS_nomenclature.zip',		
-		baloon_directory : 'mark'
-	},
-	function (){
-		planetMap.addControl(UAI_venus.search_layer());
-		All_ok();
-	},
-	true,
-	lingua
-);
-</script>
+			var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
+				compact: true,
+				collapsibleGroups: true,
+			});
+			if (USGS_WMS && USGS_WMS.layers && USGS_WMS.layers[0])
+				planetMap.addLayer(USGS_WMS.layers[0].layer);
+			planetMap.addControl(panelLayers);
+			//planetMap.addLayer(venus0);
+
+			/*planetMap.on('baselayerchange', legend_f);
+			planetMap.on('baselayeradd', legend_f);*/
+			planetMap.on('mousemove', onCoord);
+			console.log('∀ ✔');
+		};
+	</script>
+	<script src='lib/wicket.js'></script>
+	<script src='lib/shp.js'></script>
+	<script src="js/UAI_module.js"></script>
+	<script>
+		var lingua = navigator.language.split('-')[0];
+		var planetMap = L.map('mapid', { crs: L.CRS.EPSG4326 }).setView([0, 0], 3);
+		planetMap.doubleClickZoom.disable();
+		var UAI_venus = new UAI_module(
+			planetMap,
+			{
+				nomenclature_json: Config.URI.data + '/universal/nomenclature.json',
+				planet_shp: Config.URI.data + '/♀/VENUS_nomenclature.zip',
+				baloon_directory: 'mark'
+			},
+			function () {
+				planetMap.addControl(UAI_venus.search_layer());
+				All_ok();
+			},
+			true,
+			lingua
+		);
+		IO_xml(
+			'USGS_WMS',
+			Config.URI.usgs_base + '?map=' + Config.URI.usgs_group + '&service=WMS&request=GetCapabilities',
+			USGS_XML_ok,
+			Config.URI,
+			'application/xml'
+		);
+	</script>
 </body>
+
 </html>

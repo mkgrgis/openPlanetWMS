@@ -16,18 +16,23 @@ function IO_json (code, URI, retf, context, type = 'application/json'){
 	req.overrideMimeType(type);
 	req._context = context;
 	req._retf = retf;
-	req._code = code;
+	req._code = code;	
 	req.open('GET', URI, true);
 	req.addEventListener('load', function(req) {
-		var c = req.currentTarget._context;
 		var code = req.currentTarget._code;
 		IO_json.status[code] = true;
+		if (req.currentTarget.status != 200) {
+			// обработать ошибку
+			alert( '' + '\n' +req.currentTarget.status + ': ' + req.currentTarget.statusText ); 			
+		  } else {
+		var c = req.currentTarget._context;		
 		console.log( code + " ✔")
 		retf ({
 			req: req,
 			context : c
 			});
 		}
+	}
 	);
 	req.send(null);
 }

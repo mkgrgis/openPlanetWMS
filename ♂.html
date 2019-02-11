@@ -5,7 +5,7 @@
 	<title>WMS (♂) EPSG:4326</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="shortcut icon" href="images/Mars-icon.png" />
+	<link rel="shortcut icon" href="images/♂.png" />
 	<link rel="stylesheet" href="lib/leaflet.css" />
 	<link rel="stylesheet" href="lib/leaflet-search.css" />
 	<link rel="stylesheet" href="lib/leaflet-panel-layers.css" />
@@ -17,8 +17,6 @@
 </head>
 <style>
 	.coord {
-		width: 100px;
-		height: 25px;		
 		margin: 0px;
 		padding: 0px;
 		display:inline;
@@ -66,7 +64,9 @@
 				data: "https://raw.githubusercontent.com/mkgrgis/OpenPlanetaryData/master/",
 				WMS_NASA_base: 'https://trek.nasa.gov/tiles/Mars',
 				WMS_NASA_local: '/opt/Κόσμος/sr00/NASA/',
-				Mars_nomenclature_shp: 'http://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature.zip'
+				Mars_nomenclature_shp: 'http://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature.zip',
+				usgs_base: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv',
+				usgs_group: '/maps/mars/mars_simp_cyl.map'
 			}
 		}
 
@@ -74,28 +74,37 @@
 		var gMars;
 		var gr_gr;
 		var USGS_WMS;
-		var baseLayers = [null, null];
+		var usgs_ok;		
+		var baseLayers = [];
 
-		function USGS_Mars_XML_ok(o) {
-			var XML = o.req.currentTarget.responseXML;
-			USGS_WMS = USGS_layers(XML, o.context);
-			baseLayers[1] = USGS_WMS;
-			baseLayers[1].collapsed = true;
-			for (var l in baseLayers[1].layers){
-				baseLayers[1].layers[l].icon = '<i class="icon icon-usgs"></i>';
+		function USGS_XML_ok(o) {
+			if (o.req.currentTarget.status != 200){				
+				usgs_ok = true;
+				All_ok();
+				return null;
+			} else {
+				var XML = o.req.currentTarget.responseXML;
+				USGS_WMS = USGS_layers(XML, o.context);
+				USGS_WMS.collapsed = true;
+				for (var l in USGS_WMS.layers){
+					USGS_WMS.layers[l].icon = '<i class="icon icon-usgs"></i>';
+				}
+				baseLayers[1] = USGS_WMS;
+				// console.log('USGS WMS ✔');
+				usgs_ok = true;
+				All_ok();
 			}
-			All_ok();
-		}
+		}		
 
 		function WMS_json_ok(req) {
 			NASA_WMS = JSON.parse(req.currentTarget.responseText);
 			IO_ok.NASA_WMS = true;
-			console.log('NASA WMS ok');
+			console.log('NASA WMS ✔');
 			All_ok();
 		}
 
 		function All_ok() {
-			if (!IO_json.status.NASA_WMS || !UAI_mars.status || !IO_json.status.USGS_WMS)
+			if (!IO_json.status.NASA_WMS || !UAI_mars.status || !usgs_ok)
 				return;
 			var G_pref = 'https://www.google.com/mars/';
 			var gr_gr = default_graticule();
@@ -109,12 +118,17 @@
 				}
 			];
 
-			baseLayers[0] = {
-				group: 'NASA WMS',
-				layers: NASA_mars_layer_group(NASA_WMS, Config.URI.WMS_NASA_base, lingua)
-			};
+			baseLayers[0] =
+				{
+					group: 'NASA WMS',
+					layers: NASA_mars_layer_group(NASA_WMS, Config.URI.WMS_NASA_base, lingua)
+				};
 			for (var l in baseLayers[0].layers){
 				baseLayers[0].layers[l].icon = '<i class="icon icon-nasa"></i>';
+			}
+			baseLayers[1].collapsed = true;
+			for (var l in baseLayers[1].layers){
+				baseLayers[1].layers[l].icon = '<i class="icon icon-usgs"></i>';
 			}
 
 			var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
@@ -188,15 +202,12 @@
 			this
 			); // */
 
-		var _wms_usgs = {
-			base: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv',
-			map: '/maps/mars/mars_simp_cyl.map'
-		};
+		
 		IO_xml(
 			'USGS_WMS',
-			_wms_usgs.base + '?map=' + _wms_usgs.map + '&service=WMS&request=GetCapabilities',
-			USGS_Mars_XML_ok,
-			_wms_usgs,
+			Config.URI.usgs_base + '?map=' + Config.URI.usgs_group + '&service=WMS&request=GetCapabilities',
+			USGS_XML_ok,
+			Config.URI,
 			'application/xml'
 		);
 	</script>

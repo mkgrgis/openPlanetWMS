@@ -17,12 +17,12 @@ function USGS_layers (XML, context)
 		WMS_group.push({
 			name: l.getElementsByTagName('Title')[0].textContent,
 			layer: L.tileLayer.wms(
-				context.base,
+				context.usgs_base,
 				{
 					format: 'image/jpeg',
 					version: '1.1.1',
 					request: 'GetMap',
-					map: context.map,
+					map: context.usgs_group,
 					layers: l.getElementsByTagName('Name')[0].textContent,
 					srs: CRS ? CRS : 'EPSG:4326',
 					width: 256,
@@ -32,7 +32,7 @@ function USGS_layers (XML, context)
 		}); // push
 	};
 	return {
-		group: Title + '<b> (' + context.base.split('/')[2]+ ')</b>',
+		group: Title + '<b> (' + context.usgs_base.split('/')[2]+ ')</b>',
 		collapsed: false,
 		layers: WMS_group
 	};
