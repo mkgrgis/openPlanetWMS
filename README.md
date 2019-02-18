@@ -40,7 +40,7 @@ Full list of dependences see in html/js debugger network section.
 
 # Some impotant files
 
-  https://github.com/mkgrgis/OpenPlanetaryData/blob/master/%E2%99%82/MARS_nomenclature.json.json - contures of objects
+  https://github.com/mkgrgis/OpenPlanetaryData/blob/master/%E2%99%82/MARS_nomenclature.json - contures of objects
   
   https://github.com/mkgrgis/OpenPlanetaryData/blob/master/%E2%99%82/MARS_nomenclature.zip - official (but not always actual) nomenclature, copyed from http://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature.zip
   
