@@ -13,7 +13,7 @@
 	<script src="lib/leaflet-search.js"></script>
 	<script src="lib/leaflet-panel-layers.js"></script>
 	<script src="js/OpenPlanetWMS.js"></script>
-	<script src="lib/L.Graticule.js"></script>
+	<script src="lib/leaflet.latlng-graticule.js"></script>
 </head>
 <style>
 	.coord {
@@ -107,21 +107,25 @@
 			if (!IO_json.status.NASA_WMS || !UAI_mars.status || !usgs_ok)
 				return;
 			var G_pref = 'https://www.google.com/mars/';
-			var gr_gr = default_graticule();
+			
+//			UAI_mars.UAI_layers.layers[0].active = false;
 			var overLayers = [
 				UAI_mars.UAI_layers,
 				// gMars_group(gMars, G_pref),
-				{
+				/*{
 					group: "#",
-					collapsed: true,
+					collapsed: false,
 					layers: gr_gr
-				}
+				},*/
+					
 			];
 
 			baseLayers[0] =
 				{
 					group: 'NASA WMS',
-					layers: NASA_mars_layer_group(NASA_WMS, Config.URI.WMS_NASA_base, lingua)
+					layers: NASA_mars_layer_group(NASA_WMS, Config.URI.WMS_NASA_base, lingua),
+					collapsed: true
+
 				};
 			for (var l in baseLayers[0].layers){
 				baseLayers[0].layers[l].icon = '<i class="icon icon-nasa"></i>';
@@ -130,6 +134,8 @@
 			for (var l in baseLayers[1].layers){
 				baseLayers[1].layers[l].icon = '<i class="icon icon-usgs"></i>';
 			}
+			
+			//baseLayers[2] =  OPM_layers_mars();
 
 			var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
 				compact: true,
@@ -139,7 +145,8 @@
 				title: "WMS & data"
 			});
 			planetMap.addControl(panelLayers);
-			planetMap.addLayer(baseLayers[0].layers[0].layer);
+			if (baseLayers[0] && baseLayers[0].layers[0] && baseLayers[0].layers[0].layer)
+				planetMap.addLayer(baseLayers[0].layers[0].layer);
 			/*planetMap.on('zoomend', function() {
 				if (planetMap.getZoom()<7)
 					planetMap.removeLayer(gr_gr[0].layer);
@@ -159,12 +166,19 @@
 			planetMap.on('baselayerchange', legend_f);
 			planetMap.on('baselayeradd', legend_f);
 			planetMap.on('mousemove', onCoord);
+			planetMap.on('baselayerchange', function(e) { 
+				if (e.layer.options && e.layer.options.maxZoom){
+					var lm = e.layer.options.maxZoom;
+					var z =  planetMap.getZoom();
+					if (z)
+						planetMap.setZoom(Math.min(lm, z));
+				}					
+			} );
 			console.log('∀ ✔');
 		};
 
-
 		var lingua = 'ru';//navigator.language.split('-')[0];
-		var planetMap = L.map('mapid', { crs: L.CRS.EPSG4326 }).setView([0, 0], 3);
+		var planetMap = L.map('mapid', { crs: L.CRS.EPSG4326 }).setView([0, 0], 1);
 		planetMap.doubleClickZoom.disable();
 		var UAI_mars = new UAI_module(
 			planetMap,
@@ -178,8 +192,11 @@
 				planetMap.addControl(UAI_mars.search_layer());
 				All_ok();
 			},
-			true,
-			lingua
+			{
+				norm180: true,
+				lingua: lingua,
+				active: false
+			}
 		);
 
 		IO_json(
