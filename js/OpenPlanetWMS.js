@@ -1,5 +1,182 @@
 // js lib for OpenPlanetWMS , GPL v3.0
 
+L.OpenPlanetaryMap = {};
+L.OpenPlanetaryMap.Config = {
+	URI: {
+		data: "https://raw.githubusercontent.com/mkgrgis/OpenPlanetaryData/master/",
+		usgs_base: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv'
+	}		
+};
+
+
+L.OpenPlanetaryMap.TileLayers = {
+	"☿" : {
+		"EPSG4326": [ // x=y
+			{
+				name: '☿ <b>(212.201.46.76)</b>',
+				layer: L.tileLayer.wms(
+					'http://212.201.46.76:8080/geoserver/planet/wms',
+					{
+						layers: 'mercury_basemap',
+						tiled: true,
+						format: 'image/png',
+						transparent: true,
+						width: 256,
+						height: 256,
+						'CRS': 'EPSG:3857',
+						version: '1.3.0',
+						request: 'GetMap'
+					}
+				)
+			},
+			//usgs_group: '/maps/mercury/mercury_simp_cyl.map'
+			
+				
+			
+		]
+	},
+	"♀" : {
+		"EPSG4326": [ // x=y
+		]
+	},
+	"♂" : {
+		"EPSG4326": [ // x=y
+
+		],
+		"EPSG3857": [ // google web
+
+		]
+	}
+	
+};
+/*
+"♃" : "JUPITER" ,
+	 "MARS",
+	"☿" : "MERCURY",
+	"♆" : "NEPTUNE",
+	"♄" : "SATURN",
+	"⛢" : "URANUS",
+	"VENUS",
+	"♇" : "PLUTO"
+*/
+
+
+
+
+var templateRe = /\{ *([\w_-]+) *\}/g;
+	function template(str, data) {
+		return str.replace(templateRe, function (str, key) {
+			var value = data[key];
+	
+			if (value === undefined) {
+				throw new Error('No value provided for variable ' + str);
+	
+			} else if (typeof value === 'function') {
+				value = value(data);
+			}
+		return value;
+		});
+	}
+
+L.TileLayer.OPM_tms = L.TileLayer ;/*	
+L.TileLayer.OPM_tms = L.TileLayer.extend({
+	initialize: function (url, options) { // (String, Object)
+		this._url = url;		
+		//this.catalogue = options.catalogue;
+		L.setOptions(this, options);
+		},
+	onAdd: function (map) {
+		L.TileLayer.prototype.onAdd.call(this, map);
+	},
+	getTileUrl: function (c) {		
+		var dim = Math.pow(2, c.z);			
+		//c.y = dim - c.y;
+		//c.x0 = c.x
+		//c.x =  c.x - 1;
+		var url = template(this._url, c);
+		console.table(c);
+		return url;
+	}
+}); // */
+
+
+function OPM_layers_mars()
+{
+  var baseUrl = 'http://s3-eu-west-1.amazonaws.com/whereonmars.cartodb.net/';
+  var opmAttribution = '<a href="https://github.com/openplanetary/opm/wiki/OPM-Basemaps" target="blank">OpenPlanetaryMap</a>'
+
+  // Set basemaps
+  var OPM_MarsBasemap_noLabels = new L.TileLayer('https://cartocdn-gusc.global.ssl.fastly.net/opmbuilder/api/v1/map/named/opm-mars-basemap-v0-1/0,1,2,3,4/{z}/{x}/{y}.png', {
+    maxNativeZoom: 9,
+    zoom: 3,
+    tms: false,
+	attribution: opmAttribution,
+	crs: L.CRS.EPSG3857
+  });//.setZIndex(0);
+
+  var basemapTexture = new L.TileLayer.OPM_tms(baseUrl + 'celestia_mars-shaded-16k_global/{z}/{x}/{y}.png', {
+    maxNativeZoom: 9,
+    zoom: 3,
+    tms: true,
+    attribution: 'Celestia/praesepe | ' + opmAttribution,
+	crs: L.CRS.EPSG3857
+  });
+
+  var basemapMOLAGrey = new L.TileLayer.OPM_tms(baseUrl + 'mola-gray/{z}/{x}/{y}.png', {
+    attribution: 'NASA/MOLA | ' + opmAttribution,
+    tms:true,
+	maxNativeZoom: 9,
+	crs: L.CRS.EPSG3857
+  });
+
+  var basemapMOLAColor = new L.TileLayer.OPM_tms(baseUrl + 'mola-color/{z}/{x}/{y}.png', {
+    attribution: 'NASA/MOLA | ' + opmAttribution,
+    tms: true,
+	maxNativeZoom: 6,
+	crs: L.CRS.EPSG3857
+  });
+
+  var basemapViking = new L.TileLayer.OPM_tms(baseUrl + 'viking_mdim21_global/{z}/{x}/{y}.png', {
+    attribution: 'NASA/Viking/USGS | ' + opmAttribution,
+    tms:true,
+	maxNativeZoom: 7,
+	crs: L.CRS.EPSG3857
+  });
+
+  var basemapHillshade = new L.TileLayer.OPM_tms('https://s3.us-east-2.amazonaws.com/opmmarstiles/hillshade-tiles/{z}/{x}/{y}.png', {
+    attribution: 'NASA/MOLA | ' + opmAttribution,
+    tms:true,
+	maxNativeZoom: 7,
+	crs: L.CRS.EPSG3857
+  });
+
+  var Layer_gr = {
+	group: '<b>OpenPlanetaryMap</b>',
+	collapsed: false,
+	layers:[]
+  };
+
+var gd = {
+	"OPM Mars Basemap (no labels) v0.1": OPM_MarsBasemap_noLabels,
+	"OPM Shaded Mars Surface Texture Map": basemapTexture,
+	"OPM Shaded Grayscale MOLA Elevation": basemapMOLAGrey,
+	"OPM Shaded Colour MOLA Elevation": basemapMOLAColor,
+	"OPM Global Viking MDIM2.1 Colorized Mosaic": basemapViking,
+	"OPM Global Hillshade Map": basemapHillshade
+	};
+
+for (var n in gd){
+	Layer_gr.layers.push(
+		{
+			name : n,
+			layer: gd[n]
+		}
+	);
+}
+return Layer_gr;
+}
+
+
 function USGS_layers (XML, context)
 {
 	var T_ = XML.getElementsByTagName('Service')[0].getElementsByTagName('Title')[0];
@@ -41,7 +218,7 @@ function USGS_layers (XML, context)
 function NASA_mars_layer_group (NASA_WMS, URI_base, lingua){
 	function Mars_layer(id, WMS_dir, ext, z, attribution){
 		var tl = new L.TileLayer(WMS_dir + '/{z}/{y}/{x}' + ext ,{
-			maxZoom: z+1,
+			maxZoom: z-1,
 			attribution: attribution,
 			id: 'mars.' + id
 		});
@@ -61,27 +238,22 @@ function NASA_mars_layer_group (NASA_WMS, URI_base, lingua){
 
 function default_graticule (){
 	return [
-		{
-			name: "1°",
-			layer: L.graticule({
-				interval: 1,
-				style: {
-					color: '#ffffff',
-					weight: 1
-				}
+		{	name: 'x',		
+			layer: 	L.latlngGraticule({
+				showLabel: true,
+				color: '#222',
+				zoomInterval: [
+					{start: 2, end: 3, interval: 30, sides : ['C', 'Ю', 'В', 'З']},
+					{start: 4, end: 4, interval: 10, sides : ['C', 'Ю', 'В', 'З']},
+					{start: 5, end: 7, interval: 5, sides : ['C', 'Ю', 'В', 'З']},
+					{start: 8, end: 10, interval: 1, sides : ['C', 'Ю', 'В', 'З']}
+				],
+				sides : ['C', 'Ю', 'В', 'З'],
+				axis: ['Гринвич', 'Экватор']
 			})
-		},
-		{
-			name: "10°",
-			layer: L.graticule({
-				interval: 10,
-				style: {
-					color: '#EDF714',
-					weight: 1
-				}
-			})
+			
 		}
-	];	
+	];
 }
 
 function doubleToDegree(c60){

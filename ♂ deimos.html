@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>WMS (♄ - Titan) EPSG:4326</title>
+	<title>WMS (♂ deimos) EPSG:4326</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" href="images/Mars-icon.png" />
@@ -41,7 +41,7 @@
 </style>
 
 <body>
-	<h2>Demo (♄ - Titan) <a href='https://github.com/mkgrgis/openPlanetWMS'>openPlanetWMS</a></h2>
+	<h2>Demo (♂ deimos) <a href='https://github.com/mkgrgis/openPlanetWMS'>openPlanetWMS</a></h2>
 	<div id="mapid" style="width: 98vw; height: 800px;"></div>
 	<div name="coord" style="display:inline-block;">
 		<div style="display:inline-block; width:175px; ">
@@ -61,7 +61,7 @@
 			URI: {
 				data: "https://raw.githubusercontent.com/mkgrgis/OpenPlanetaryData/master/",
 				usgs_base: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv',
-				usgs_group: '/maps/saturn/titan_simp_cyl.map'
+				usgs_group: '/maps/mars/deimos_simp_cyl.map'
 			}
 		}
 
@@ -82,7 +82,7 @@
 				for (var l in USGS_WMS.layers){
 					USGS_WMS.layers[l].icon = '<i class="icon icon-usgs"></i>';
 				}
-				baseLayers[0] = USGS_WMS;
+				baseLayers[1] = USGS_WMS;
 				// console.log('USGS WMS ✔');
 				usgs_ok = true;
 				All_ok();
@@ -90,38 +90,12 @@
 		}
 
 		function All_ok() {
-			if (!UAI_titan.status || !usgs_ok)
+			if (!UAI_deimos.status || !usgs_ok)
 				return;
-
-			/*
-			https://webgis3.wr.usgs.gov/arcgis/rest/services/Titan_SAR_Basemap/MapServer/export?
-dpi=96&
-transparent=true&
-format=png24&
-layers=show:0,1&
-size=256,256&
-f=image
-*/
-			var l0 = L.tileLayer.wms(
-			'https://webgis3.wr.usgs.gov/arcgis/rest/services/Titan_SAR_Basemap/MapServer/export',
-				{
-					//layers: 'show:0,1',
-					//tiled: true,
-					format: 'png24',
-					transparent: true,
-					size: '256,256',					
-					f: 'image'
-				}
-			);
-			baseLayers[0] = USGS_WMS;
-			baseLayers[1] = {
-				name: '♄ - Titan <b>(webgis3.wr.usgs.gov)</b>',
-				layer: l0
-			};
-			
+			baseLayers[0] = USGS_WMS;			
 			var gr_gr = default_graticule();
 			var overLayers = [
-				UAI_titan.UAI_layers,
+				UAI_deimos.UAI_layers,
 				{
 					group: "#",
 					collapsed: false,
@@ -147,15 +121,15 @@ f=image
 		var lingua = navigator.language.split('-')[0];
 		var planetMap = L.map('mapid', { crs: L.CRS.EPSG4326 }).setView([0, 0], 3);
 		planetMap.doubleClickZoom.disable();
-		var UAI_titan = new UAI_module(
+		var UAI_deimos = new UAI_module(
 			planetMap,
 			{
 				nomenclature_json: Config.URI.data + '/universal/nomenclature.json',
-				planet_shp: Config.URI.data + '/♄/TITAN_nomenclature.zip',
+				planet_shp: Config.URI.data + '/♂/DEIMOS_nomenclature.zip',
 				baloon_directory: 'mark'
 			},
 			function () {
-				planetMap.addControl(UAI_titan.search_layer());
+				planetMap.addControl(UAI_deimos.search_layer());
 				All_ok();
 			},
 			true,

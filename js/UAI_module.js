@@ -46,13 +46,13 @@ IO_json.status = {};
  * @param {*} norm180 coord. 1= -180<*<180,  0 = 0<*<360
  * @param {*} lingua lingua
  */
-function UAI_module(leaflet_map, paths, retf, norm180, lingua){
+function UAI_module(leaflet_map, paths, retf, options){
 	this.status = false;
-	this.lingua = lingua;
+	this.options = options;
+	this.lingua = (options && options.lingua) ? lingua : navigator.language.split('-')[0];
 	this._lmap = leaflet_map;
 	this._retf = retf;
-	this.n180 = (norm180 ? true : false);	
-	this.paths = paths;
+	this.paths = paths;	
 	this._knt = [];
 	IO_json(
 		'nom_univ', 
@@ -127,7 +127,7 @@ UAI_module.prototype.nomencl_ok = function() {
 	var UAI_layers = [];
  
 	UAI_layers.push({
-		active: true,
+		//active: (this.options.active == true),
 		name: "∀ UAI",
 		layer: this.shpfile
 	});
@@ -139,7 +139,7 @@ UAI_module.prototype.nomencl_ok = function() {
 		var text = '';
 		text = this.nomencl_descr(k, text);
 		text += " (" + k.toLowerCase() + ")";
-		UAI_layers.push({ // active: true,
+		UAI_layers.push({
 			name: text,
 			layer: UAI_l
 		});	 
@@ -236,7 +236,7 @@ var utf8Decode=function(utftext){var string="";var i=0;var c=c1=c2=0;while(i<utf
 		fp.center = new L.LatLng(fp.center_lat, fp.center_lon);
 		delete fp.center_lat;
 		delete fp.center_lon;	  
-		if (this.n180 && layer._latlng.lng > 180.0)
+		if (this.options && this.options.norm180 && layer._latlng.lng > 180.0)
 			layer._latlng.lng -= 360.0;
 		layer.options.icon = L.icon({
 			iconUrl: this.paths.baloon_directory + '/' + categ.toLowerCase() +'.png',
@@ -349,7 +349,7 @@ UAI_module.prototype.info = function (fp, layer) {
 }
  
 UAI_module.prototype.norm180 = function (a) {
-	if (! this.n180)
+	if (! this.options || ! this.options.norm180)
 		return a;
 	var n = [];
 	for (var i in a){
@@ -371,8 +371,10 @@ UAI_module.prototype.wktPolygon = function (p, id){
 }
  
 UAI_module.prototype.wktProcess = function(id, geoJson) {	 
+	if (typeof paths.planet_wkt_json == 'undefined')
+		return;
 	if (typeof this.UAI_kontur == 'undefined' || typeof this.UAI_kontur[id] == 'undefined'){
-			console.warn('Nenio elemento!');
+			console.warn('Non wkt ' + id + ' !');
 			return;
 	}
 	var el_wkt = this.UAI_kontur[id];
