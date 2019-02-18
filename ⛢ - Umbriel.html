@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>WMS (⛢ - Umbriel) EPSG:4326</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="images/Mars-icon.png" />
+	<link rel="stylesheet" href="lib/leaflet.css" />
+	<link rel="stylesheet" href="lib/leaflet-search.css" />
+	<link rel="stylesheet" href="lib/leaflet-panel-layers.css" />
+	<script src="lib/leaflet.js"></script>
+	<script src="lib/leaflet-search.js"></script>
+	<script src="lib/leaflet-panel-layers.js"></script>
+	<script src="js/OpenPlanetWMS.js"></script>
+	<script src="lib/leaflet.latlng-graticule.js"></script>
+</head>
+<style>
+	.coord {
+		margin: 0px;
+		padding: 0px;
+		display: inline;
+		font-size: 10pt;
+	}
+
+	.icon {
+		display: inline-block;
+		margin: 0px;
+		height: 16px;
+		width: 16px;
+		background-color: #ccc;
+	}
+
+	.icon-usgs {
+		background: url('images/usgs.png') center center no-repeat;
+	}
+
+	.icon-nasa {
+		background: url('images/nasa.png') center center no-repeat;
+	}
+</style>
+
+<body>
+	<h2>Demo (⛢ - Umbriel) <a href='https://github.com/mkgrgis/openPlanetWMS'>openPlanetWMS</a></h2>
+	<div id="mapid" style="width: 98vw; height: 800px;"></div>
+	<div name="coord" style="display:inline-block;">
+		<div style="display:inline-block; width:175px; ">
+			<p class="coord" id="lat"></p>
+			<p class="coord">&nbsp</p>
+			<p class="coord" id="lon"></p>
+		</div>
+		<div style="display:inline-block; width:175px;">
+			<p class="coord" id="lat_60"></p>
+			<p class="coord">&nbsp</p>
+			<p class="coord" id="lon_60"> </p>
+		</div>
+	</div>
+	</br>
+	<script>
+		var Config = {
+			URI: {
+				data: "https://raw.githubusercontent.com/mkgrgis/OpenPlanetaryData/master/",
+				usgs_base: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv',
+				usgs_group: '/maps/uranus/umbriel_simp_cyl.map'
+			}
+		}
+
+		var gr_gr;
+		var USGS_WMS;
+		var usgs_ok;
+		var baseLayers = [];
+
+		function USGS_XML_ok(o) {
+			if (o.req.currentTarget.status != 200){				
+				usgs_ok = true;
+				All_ok();
+				return null;
+			} else {
+				var XML = o.req.currentTarget.responseXML;
+				USGS_WMS = USGS_layers(XML, o.context);
+				USGS_WMS.collapsed = true;
+				for (var l in USGS_WMS.layers){
+					USGS_WMS.layers[l].icon = '<i class="icon icon-usgs"></i>';
+				}
+				baseLayers[0] = USGS_WMS;
+				// console.log('USGS WMS ✔');
+				usgs_ok = true;
+				All_ok();
+			}
+		}
+
+		function All_ok() {
+			if (!UAI_umbriel.status || !usgs_ok)
+				return;
+
+			baseLayers[0] = USGS_WMS;
+						
+			var gr_gr = default_graticule();
+			var overLayers = [
+				UAI_umbriel.UAI_layers,
+				{
+					group: "#",
+					collapsed: false,
+					layers: gr_gr
+				}
+			];
+
+			var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
+				compact: true,
+				collapsibleGroups: true,
+			});
+			if (USGS_WMS && USGS_WMS.layers && USGS_WMS.layers[0])
+				planetMap.addLayer(USGS_WMS.layers[0].layer);
+			planetMap.addControl(panelLayers);
+			planetMap.on('mousemove', onCoord);
+			console.log('∀ ✔');
+		};
+	</script>
+	<script src='lib/wicket.js'></script>
+	<script src='lib/shp.js'></script>
+	<script src="js/UAI_module.js"></script>
+	<script>
+		var lingua = navigator.language.split('-')[0];
+		var planetMap = L.map('mapid', { crs: L.CRS.EPSG4326 }).setView([0, 0], 3);
+		planetMap.doubleClickZoom.disable();
+		var UAI_umbriel = new UAI_module(
+			planetMap,
+			{
+				nomenclature_json: Config.URI.data + '/universal/nomenclature.json',
+				planet_shp: Config.URI.data + '/⛢/UMBRIEL_nomenclature.zip',
+				baloon_directory: 'mark'
+			},
+			function () {
+				planetMap.addControl(UAI_umbriel.search_layer());
+				All_ok();
+			},
+			true,
+			lingua
+		);
+		IO_xml(
+			'USGS_WMS',
+			Config.URI.usgs_base + '?map=' + Config.URI.usgs_group + '&service=WMS&request=GetCapabilities',
+			USGS_XML_ok,
+			Config.URI,
+			'application/xml'
+		);
+	</script>
+</body>
+</html>
