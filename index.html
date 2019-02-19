@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>astro</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">	
+	<script src="js/UAI_module.js"></script>
+</head>
+<body>
+	<h2>Demo <a href='https://github.com/mkgrgis/openPlanetWMS'>openPlanetWMS</a></h2>
+	<div id="planet_"></div>	
+	</br>
+	<script>
+		var Config = {
+			URI: {
+				data: "https://raw.githubusercontent.com/mkgrgis/OpenPlanetaryData/master/",
+				wikidata: "https://www.wikidata.org/wiki/Special:EntityData/"
+			}		
+		}
+		var lingua = navigator.language.split('-')[0];
+
+		IO_json(
+			'OpenPlanetaryDataUniversal',
+			Config.URI.data + 'universal.json',
+			Universal_ok,
+			null
+		);
+
+		
+		function Universal_ok(o) {
+			if (o.req.currentTarget.status != 200){
+				alert ('"Non ' + Config.URI.data + 'universal.json!' );				
+				return;
+			}			
+			var planetStruct = JSON.parse(o.req.currentTarget.responseText);
+			var div0 = document.getElementById('planet_');
+
+
+			for (var planete in planetStruct.systeme){
+				var p = planetStruct.systeme[planete];
+				var d_p = document.createElement('div');
+				d_p.lang = lingua;
+				p.div = d_p;
+				var a_p = document.createElement('a');
+				if (p.wms)
+					a_p.href = planete + '.html';
+				d_p.className='planete';
+				a_p.innerText = planete;
+				var wd = p.wikidata;
+				IO_json(
+					wd,
+					Config.URI.wikidata + wd + '.json',
+					Wikidata_ok,
+					{
+						a: a_p,
+						div: d_p,
+						wd: wd
+					}
+				);
+				div0.appendChild(d_p);
+				d_p.appendChild(a_p);
+				
+			}
+
+			for (var element in planetStruct.element){
+				var e = planetStruct.element[element];
+				var d_e = document.createElement('div');
+				var a_e = document.createElement('a');
+				a_e.href = e + ' - ' + element[0].toUpperCase() + element.slice(1).toLowerCase() + '.html';
+				d_e.className='element';
+				a_e.innerText = element;
+				/*var wd = p.wikidata;
+				IO_json(
+					wd,
+					Config.URI.wikidata + wd + '.json',
+					Wikidata_ok,
+					{
+						a: a_p,
+						div: d_p,
+						wd: wd
+					}
+				);
+				div0.appendChild(d_p);
+				d_p.appendChild(a_p);
+				p.div = d_p;*/
+				for (var planete in planetStruct.systeme){
+					if (planete == e){
+						var base_div = planetStruct.systeme[planete].div;						
+						base_div.parentNode.insertBefore(d_e, base_div.nextSibling);						
+						d_e.appendChild(a_e);
+					}
+				}
+			}
+			console.log('∀ ✔');
+		}
+
+		function Wikidata_ok(o) {
+			if (o.req.currentTarget.status != 200){
+				console.warn(' wikidata ' + o.req.context );				
+				return;
+			}			
+			var wd_json = JSON.parse(o.req.currentTarget.responseText);
+			var txt = wd_json.entities[o.context.wd];
+
+			var p = document.createElement('p');
+			p.className = 'planetdescription';
+			p.innerText +=  '(' + txt.descriptions[lingua].value + ')';
+			o.context.div.appendChild(p);			
+			o.context.a.innerText += ' ' + txt.labels[lingua].value;
+		}
+	</script>	
+</body>
+</html>
