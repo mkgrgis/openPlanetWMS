@@ -67,9 +67,10 @@
 				var e = planetStruct.element[element];
 				var d_e = document.createElement('div');
 				var a_e = document.createElement('a');
-				a_e.href = e + ' - ' + element[0].toUpperCase() + element.slice(1).toLowerCase() + '.html';
+				var e_norm = element[0].toUpperCase() + element.slice(1).toLowerCase();
+				a_e.href = e + ' - ' + e_norm + '.html';
 				d_e.className='element';
-				a_e.innerText = element;
+				a_e.innerText = e_norm;
 				/*var wd = p.wikidata;
 				IO_json(
 					wd,
