@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>WMS (♂) EPSG:4326</title>
+	<title>WMS (♂) EPSG:3857</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" href="images/♂.png" />
@@ -34,6 +34,9 @@
 	}
 	.icon-nasa {
 		background: url('images/nasa.png') center center no-repeat;
+	}
+	.icon-opm {
+		background: url('images/opm.png') center center no-repeat;
 	}
 </style>
 <body>
@@ -76,25 +79,7 @@
 		var USGS_WMS;
 		var usgs_ok;		
 		var baseLayers = [];
-
-		function USGS_XML_ok(o) {
-			if (o.req.currentTarget.status != 200){				
-				usgs_ok = true;
-				All_ok();
-				return null;
-			} else {
-				var XML = o.req.currentTarget.responseXML;
-				USGS_WMS = USGS_layers(XML, o.context);
-				USGS_WMS.collapsed = true;
-				for (var l in USGS_WMS.layers){
-					USGS_WMS.layers[l].icon = '<i class="icon icon-usgs"></i>';
-				}
-				baseLayers[1] = USGS_WMS;
-				// console.log('USGS WMS ✔');
-				usgs_ok = true;
-				All_ok();
-			}
-		}		
+		
 
 		function WMS_json_ok(req) {
 			NASA_WMS = JSON.parse(req.currentTarget.responseText);
@@ -104,11 +89,12 @@
 		}
 
 		function All_ok() {
-			if (!IO_json.status.NASA_WMS || !UAI_mars.status || !usgs_ok)
+			if (!UAI_mars.status)
 				return;
 			var G_pref = 'https://www.google.com/mars/';
 			
 			var gr_gr = default_graticule();
+			var opmAttribution = '<a href="https://github.com/openplanetary/opm/wiki/OPM-Basemaps" target="blank">OpenPlanetaryMap</a>';
 			var overLayers = [
 				UAI_mars.UAI_layers,
 				// gMars_group(gMars, G_pref),
@@ -116,25 +102,49 @@
 					group: "#",
 					collapsed: false,
 					layers: gr_gr
-				}
+				},
+				{
+					group: "OPM Nomenclature",
+					collapsed: false,
+					layers: [
+						{
+							name: 'Nomenclature',
+							layer: new L.TileLayer('https://cartocdn-gusc.global.ssl.fastly.net/nmanaud/api/v1/map/named/opm-mars-basemap-v0-1/5/{z}/{x}/{y}.png', {
+								maxNativeZoom: 9,
+								zoom: 3,
+								tms: false,
+								attribution: opmAttribution,
+								crs: L.CRS.EPSG3857
+						  	})
+						},
+						{
+							name: 'Relief',
+							layer: new L.TileLayer('https://cartocdn-gusc.global.ssl.fastly.net/nmanaud/api/v1/map/named/opm-mars-basemap-v0-1/4/{z}/{x}/{y}.png', {
+								maxNativeZoom: 9,
+								zoom: 3,
+								tms: false,
+								attribution: opmAttribution,
+								crs: L.CRS.EPSG3857
+						  	})
+						},
+						{
+							layer: new L.TileLayer('https://cartocdn-gusc.global.ssl.fastly.net/nmanaud/api/v1/map/named/opm-mars-basemap-v0-1/3/{z}/{x}/{y}.png', {
+								maxNativeZoom: 9,
+								zoom: 3,
+								tms: false,
+								attribution: opmAttribution,
+								crs: L.CRS.EPSG3857
+						  	})
+						}
+					]
+				}				
 			];
 
-			baseLayers[0] =
-				{
-					group: 'NASA WMS',
-					layers: NASA_mars_layer_group(NASA_WMS, Config.URI.WMS_NASA_base, lingua),
-					collapsed: true
+			baseLayers[0] = OPM_layers_mars();
 
-				};
 			for (var l in baseLayers[0].layers){
-				baseLayers[0].layers[l].icon = '<i class="icon icon-nasa"></i>';
-			}
-			baseLayers[1].collapsed = true;
-			for (var l in baseLayers[1].layers){
-				baseLayers[1].layers[l].icon = '<i class="icon icon-usgs"></i>';
-			}
-			
-			//baseLayers[2] =  OPM_layers_mars();
+				baseLayers[0].layers[l].icon = '<i class="icon icon-opm"></i>';
+			}			
 
 			var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
 				compact: true,
@@ -177,7 +187,7 @@
 		};
 
 		var lingua = 'ru';//navigator.language.split('-')[0];
-		var planetMap = L.map('mapid', { crs: L.CRS.EPSG4326 }).setView([0, 0], 1);
+		var planetMap = L.map('mapid').setView([0, 0], 1);
 		planetMap.doubleClickZoom.disable();
 		var UAI_mars = new UAI_module(
 			planetMap,
@@ -196,17 +206,7 @@
 				lingua: lingua,
 				active: false
 			}
-		);
-
-		IO_json(
-			'NASA_WMS',
-			'WMS_♂_NASA_EQ.json',
-			function (o) {
-				NASA_WMS = JSON.parse(o.req.currentTarget.responseText);
-				All_ok();
-			},
-			this
-		);
+		);		
 		/*
 		IO_json(
 			'gMars', 
@@ -217,15 +217,6 @@
 				},
 			this
 			); // */
-
-		
-		IO_xml(
-			'USGS_WMS',
-			Config.URI.usgs_base + '?map=' + Config.URI.usgs_group + '&service=WMS&request=GetCapabilities',
-			USGS_XML_ok,
-			Config.URI,
-			'application/xml'
-		);
 	</script>
 </body>
 </html>
