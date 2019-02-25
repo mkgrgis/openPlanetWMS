@@ -93,6 +93,9 @@
 			if (!UAI_titan.status || !usgs_ok)
 				return;
 
+
+
+
 			/*
 			https://webgis3.wr.usgs.gov/arcgis/rest/services/Titan_SAR_Basemap/MapServer/export?
 dpi=96&
@@ -118,6 +121,27 @@ f=image
 				name: '♄ - Titan <b>(webgis3.wr.usgs.gov)</b>',
 				layer: l0
 			};
+
+			var imageUrl = '♄ - Titan/Titan_map_April_2011_full.png';
+			var imageUrl1 = 'https://pre00.deviantart.net/bea3/th/pre/i/2017/057/7/f/titan_texture_map_8k_by_fargetanik-db0f8m0.png';
+			var imageUrl2 = 'https://astropedia.astrogeology.usgs.gov/download/Titan/Cassini/Global-Mosaic/thumbs/Titan_HiSAR_MosaicThru_T104_Jan2015_clon180_128ppd_quarter.png';
+			var imageBounds = [[90, 0], [-90, 360]];
+			var imageBounds1 = [[90, -180], [-90, 180]];
+
+			baseLayers[2] = {
+				name: "ч/б полный",
+				layer: L.imageOverlay(imageUrl, imageBounds)
+			};
+			baseLayers[3] = {
+				name: "ч/б 2",
+				layer: L.imageOverlay(imageUrl1, imageBounds1)
+			};
+/*
+			baseLayers[4] = {
+				group: "NASA",
+				collapsed: true,
+				layers:  Titan_source.WMS_arr(Titan_source.WMS, '')
+			}; /* */
 			
 			var gr_gr = default_graticule();
 			var overLayers = [
@@ -168,6 +192,90 @@ f=image
 			Config.URI,
 			'application/xml'
 		);
+
+		var Titan_source = {			
+			WMS : {
+				c     : {
+					adr : 'EQ/Titan_global_32ppd_colorRatio',
+					tit : 'Цвет',
+					ext : '.png',
+					z   : 4
+					},
+				h	  : {
+					adr : 'EQ/Titan_SAR_HiSAR_MosaicThru_T104_Jan2015_clon180_128ppd0',
+					tit : 'Высокоточный',
+					ext : '.png',
+					z   : 6
+					},
+				g	  : {
+					adr : 'EQ/Titan_ISS_P19658_Mosaic_Global_4km0',
+					tit : 'Сила тяжести',
+					ext : '.png',
+					z   : 3
+					},
+				_2m	  : {
+					adr : 'EQ/Titan_global_32ppd_2microns',
+					tit : '2µ',
+					ext : '.png',
+					z   : 4
+					},
+				_5m	  : {
+					adr : 'EQ/Titan_global_32ppd_5microns',
+					tit : '5µ',
+					ext : '.png',
+					z   : 4
+					},
+				_2m2  : {
+					adr : 'EQ/Titan_global_32ppd_ratio2microns_divided_by_127microns',
+					tit : '2µ/127µ',
+					ext : '.png',
+					z   : 5
+				},
+				_450M : {
+					adr : 'EQ/Titan_ISS_Globe_65Sto45N_450M_AvgMos0',
+					tit : 'avg',
+					ext : '.png',
+					z   : 6
+					},
+				_4km  : {
+					adr : 'EQ/Titan_ISS_P19658_Mosaic_Global_4km0',
+					tit : '4 км',
+					ext : '.png',
+					z   : 3
+					},
+				x15 : {
+					adr : 'EQ/Titan_SAR_HiSAR_MosaicThru_T104_Jan2015_clon180_128ppd0',
+					tit : '2015',
+					ext : '.png',
+					z   : 6
+					},
+				gc : {
+					adr : 'EQ/topo_4PPD_geoid_corrected',
+					tit : '4PPD_geoid',
+					ext : '.png',
+					z   : 2
+					}
+				},
+				WMS_arr : function (WMS, prefLoc){
+					function Titan_layer(kodo, pref, URL_el, maxZ, attribution, ext){
+						var tl = new L.TileLayer(pref + URL_el + '/{z}/{y}/{x}' + ext,{
+							maxZoom: maxZ,
+							attribution: attribution,
+							id: 'titan.' + kodo	
+						});
+					return tl;
+					}
+					
+					var l = [];
+					for (var wi in WMS){
+						l.push({
+							name: WMS[wi].tit,
+							layer: Titan_layer(wi, prefLoc, 'trektiles.jpl.nasa.gov/trektiles/Titan/' + WMS[wi].adr + '/1.0.0/default/default028mm', WMS[wi].z, 'NASA/ESA', WMS[wi].ext)
+							});
+						}
+					return l;
+				}				
+			}
 	</script>
 </body>
 </html>
