@@ -6,7 +6,7 @@ Simple HTML/javascript Leaflet.js map of Mars from Google with official Union As
 
 <img src="https://mkgrgis.github.io/mkgrgis/openPlanetWMS/openPlanetWMS_demo.png"/>
 
-Demo http://mkgrgis.github.io/mkgrgis/openPlanetWMS/MarsMap.html
+Demo https://mkgrgis.github.io/openPlanetWMS/ , https://mkgrgis.github.io/openPlanetWMS/%E2%99%82.html
 
 # Usage
 Download and see MarsMap.html
